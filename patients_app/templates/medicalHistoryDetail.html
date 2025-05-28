@@ -1,0 +1,519 @@
+{% extends "layout.html" %}
+
+{% load static %}
+
+
+{% block title %}Medical Record Detail{% endblock %}
+
+{% block extra_head %}
+
+
+{% endblock %}
+
+
+{% block content %}
+   
+
+  <div class="modal fade" id="hpiModal" tabindex="-1">
+      <div class="modal-dialog">
+       <div class="modal-content">
+          <form id="hpiForm">
+              <div class="modal-header">
+                <h5 class="modal-title">Add HPI (History of Present Illness)</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body">
+                
+                <input id="medicalHistoryIdHPI" class="form-control mb-2" type="hidden" name="medicalHistoryId" />
+                
+                <input class="form-control mb-2" type="date" name="onsetDate" placeholder="Onset Date" required />
+                <input class="form-control mb-2" placeholder="Chief Complaint" name="chiefComplaint" required />
+                <input class="form-control mb-2" placeholder="Severity" name="severity" required />
+                <input class="form-control mb-2" placeholder="Duration" name="duration" required />
+                <input class="form-control mb-2" placeholder="Location" name="location" />
+                <input class="form-control mb-2" placeholder="Radiation" name="radiation" />
+                <input class="form-control mb-2" placeholder="Quality" name="quality" />
+                <textarea class="form-control mb-2" placeholder="Associated Symptoms" name="associatedSymptoms"></textarea>
+                <textarea class="form-control mb-2" placeholder="Aggravating Factors" name="aggravatingFactors"></textarea>
+                <textarea class="form-control mb-2" placeholder="Relieving Factors" name="relievingFactors"></textarea>
+                <textarea class="form-control mb-2" placeholder="Previous Treatments" name="previousTreatments"></textarea>
+                <textarea class="form-control mb-2" placeholder="Additional Notes" name="additionalNotes"></textarea>
+              </div>
+              <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">Save HPI</button>
+              </div>
+            </form>
+        </div>
+      </div>
+   </div>
+
+
+   <div class="modal fade" id="patientIntakeModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+          <form id="patientIntakeForm">
+              <div class="modal-header">
+                <h5 class="modal-title">Add Patient Intake</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body">
+                
+                <input id="medicalHistoryIdPatientIntake" class="form-control mb-2" type="hidden" name="medicalHistoryId" />
+                
+                <select class="form-control mb-2" name="maritalStatus" required>
+                  <option value="">Select Marital Status</option>
+                  <option value="Single">Single</option>
+                  <option value="Married">Married</option>
+                  <option value="Divorced">Divorced</option>
+                  <option value="Widowed">Widowed</option>
+                </select>
+                
+                <select class="form-control mb-2" name="smokingStatus" required>
+                  <option value="">Select Smoking Status</option>
+                  <option value="Never">Never</option>
+                  <option value="Former">Former</option>
+                  <option value="Current">Current</option>
+                </select>
+                
+                <select class="form-control mb-2" name="alcoholUse" required>
+                  <option value="">Select Alcohol Use</option>
+                  <option value="Never">Never</option>
+                  <option value="Occasional">Occasional</option>
+                  <option value="Frequent">Frequent</option>
+                </select>
+                
+                <select class="form-control mb-2" name="drugUse" required>
+                  <option value="">Select Drug Use</option>
+                  <option value="Never">Never</option>
+                  <option value="Occasional">Occasional</option>
+                  <option value="Frequent">Frequent</option>
+                </select>
+  
+                <input class="form-control mb-2" placeholder="Occupation" name="occupation" />
+                <textarea class="form-control mb-2" placeholder="Family History" name="familyHistory"></textarea>
+                <textarea class="form-control mb-2" placeholder="Social History" name="socialHistory"></textarea>
+                <textarea class="form-control mb-2" placeholder="Allergies" name="allergies"></textarea>
+                <textarea class="form-control mb-2" placeholder="Immunization History" name="immunizationHistory"></textarea>
+                <textarea class="form-control mb-2" placeholder="Previous Medical Procedures" name="previousMedicalProcedures"></textarea>
+                <textarea class="form-control mb-2" placeholder="Current Medications" name="currentMedications"></textarea>
+                <textarea class="form-control mb-2" placeholder="Additional Notes" name="additionalNotes"></textarea>
+              </div>
+              <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">Save Intake</button>
+              </div>
+            </form>
+      </div>
+    </div>
+  </div>
+
+  
+
+  <div class="modal fade" id="diagnosesModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+          <form id="diagnosesForm">
+              <div class="modal-header">
+                <h5 class="modal-title">Add Diagnosis</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body">
+                
+                <input id="medicalHistoryIdDiagnoses" class="form-control mb-2" type="hidden" name="medicalHistoryId" />
+                
+                <input class="form-control mb-2" placeholder="Diagnosis Code" name="diagnosisCode" required />
+                <input class="form-control mb-2" placeholder="Diagnosis Name" name="diagnosisName" required />
+                <input class="form-control mb-2" type="date" name="dateOfDiagnosis" required />
+                
+                <select class="form-control mb-2" name="status" required>
+                  <option value="">Select Status</option>
+                  <option value="Active">Active</option>
+                  <option value="Resolved">Resolved</option>
+                  <option value="Chronic">Chronic</option>
+                </select>
+  
+                <textarea class="form-control mb-2" placeholder="Notes" name="notes"></textarea>
+              </div>
+              <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">Save Diagnosis</button>
+              </div>
+            </form>
+      </div>
+    </div>
+  </div>
+
+  
+
+  <div class="modal fade" id="vitalSignModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+          <form id="vitalSignForm">
+              <div class="modal-header">
+                <h5 class="modal-title">Add Vital Signs</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body">
+                
+                <input id="medicalHistoryIdVitalSign" class="form-control mb-2" type="hidden" name="medicalHistoryId" />
+                
+                <input class="form-control mb-2" placeholder="Systolic BP" name="bloodPressureSystolic" required />
+                <input class="form-control mb-2" placeholder="Diastolic BP" name="bloodPressureDiastolic" required />
+                <input class="form-control mb-2" placeholder="Heart Rate" name="heartRate" required />
+                <input class="form-control mb-2" placeholder="Respiratory Rate" name="respiratoryRate" required />
+                <input class="form-control mb-2" placeholder="Temperature (°C)" name="temperature" required />
+                <input class="form-control mb-2" placeholder="Weight (kg)" name="weight" required />
+                <input class="form-control mb-2" placeholder="Height (cm)" name="height" required />
+                <input class="form-control mb-2" placeholder="Oxygen Saturation (%)" name="oxygenSaturation" required />
+              </div>
+              <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">Save Vital Signs</button>
+              </div>
+            </form>
+      </div>
+    </div>
+  </div>
+  
+   
+
+
+
+  <div class="container mt-5">
+    <h2 class="mb-4">Medical History Details</h2>
+  
+    <!-- Patient Information -->
+    <div class="card mb-3">
+      <div class="card-header">
+        <h5 class="mb-0">Patient Info</h5>
+      </div>
+      <div class="card-body">
+        <ul class="list-group">
+          <li class="list-group-item"><strong>Patient ID:</strong> {{ medicalHistoryDetail.patient.patient_id }}</li>
+          <li class="list-group-item"><strong>Name:</strong> {{ medicalHistoryDetail.patient.first_name }} {{ medicalHistoryDetail.patient.last_name }}</li>
+          <li class="list-group-item"><strong>Status:</strong> {{ medicalHistoryDetail.status }}</li>
+        </ul>
+      </div>
+    </div>
+  
+    <!-- HPI -->
+    <div class="card mb-3">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">History of Present Illness (HPI)</h5>
+          <button class="btn btn-link" 
+                  type="button"
+                  data-bs-toggle="collapse" 
+                  data-bs-target="#hpiContent" 
+                  aria-expanded="false" 
+                  aria-controls="hpiContent">
+            Expand
+          </button>
+        </div>
+        <div id="hpiContent" class="collapse">
+          <div class="card-body">
+            <button class="btn-success" onclick="ShowHPIModal('{{ medicalHistoryDetail.medical_history_id}}')">Add HPI</button>
+            {% if medicalHistoryDetail.hpi %}
+            <ul class="list-group mb-3">
+              <li class="list-group-item"><strong>Chief Complaint:</strong> {{ medicalHistoryDetail.hpi.chief_complaint }}</li>
+              <li class="list-group-item"><strong>Severity:</strong> {{ medicalHistoryDetail.hpi.severity }}</li>
+              <li class="list-group-item"><strong>Duration:</strong> {{ medicalHistoryDetail.hpi.duration }}</li>
+              <li class="list-group-item"><strong>Location:</strong> {{ medicalHistoryDetail.hpi.location }}</li>
+              <li class="list-group-item"><strong>Radiation:</strong> {{ medicalHistoryDetail.hpi.radiation }}</li>
+              <li class="list-group-item"><strong>Associated Symptoms:</strong> {{ medicalHistoryDetail.hpi.associated_symptoms }}</li>
+            </ul>
+            {% else %}
+            <p>No HPI recorded.</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      
+  
+    <!-- Patient Intake -->
+    <div class="card mb-3">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Patient Intake</h5>
+        <button class="btn btn-link" data-bs-toggle="collapse" data-bs-target="#intakeContent">Expand</button>
+      </div>
+      <div id="intakeContent" class="collapse">
+        <div class="card-body">
+            <button class="btn-success" onclick="ShowPatientIntakeModal('{{ medicalHistoryDetail.medical_history_id}}')">Add Patient Inake</button>
+          {% if medicalHistoryDetail.patient_intake %}
+          <ul class="list-group mb-3">
+            <li class="list-group-item"><strong>Marital Status:</strong> {{ medicalHistoryDetail.patient_intake.marital_status }}</li>
+            <li class="list-group-item"><strong>Smoking:</strong> {{ medicalHistoryDetail.patient_intake.smoking_status }}</li>
+            <li class="list-group-item"><strong>Alcohol:</strong> {{ medicalHistoryDetail.patient_intake.alcohol_use }}</li>
+            <li class="list-group-item"><strong>Drug Use:</strong> {{ medicalHistoryDetail.patient_intake.drug_use }}</li>
+            <li class="list-group-item"><strong>Occupation:</strong> {{ medicalHistoryDetail.patient_intake.occupation }}</li>
+          </ul>
+          {% else %}
+          <p>No Patient Intake recorded.</p>
+          {% endif %}
+
+
+         
+        </div>
+
+      </div>
+    </div>
+  
+    <!-- Diagnoses -->
+    <div class="card mb-3">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Diagnoses</h5>
+        <button class="btn btn-link" data-bs-toggle="collapse" data-bs-target="#diagnosesContent">Expand</button>
+      </div>
+      <div id="diagnosesContent" class="collapse">
+        <div class="card-body">
+            <button class="btn-success" onclick="ShowDiagnosesModal('{{ medicalHistoryDetail.medical_history_id}}')">Add Diagnosis</button>
+          {% if medicalHistoryDetail.diagnoses.all %}
+          <ul class="list-group mb-3">
+            {% for diag in medicalHistoryDetail.diagnoses.all %}
+            <li class="list-group-item">
+              <strong>{{ diag.diagnosis_name }}</strong> ({{ diag.diagnosis_code }})<br>
+              <strong>Status:</strong> {{ diag.status }}<br>
+              <strong>Date:</strong> {{ diag.date_of_diagnosis }}<br>
+              <strong>Notes:</strong> {{ diag.notes }}
+            </li>
+            {% endfor %}
+          </ul>
+          {% else %}
+          <p>No Diagnoses recorded.</p>
+
+              
+          {% endif %}
+              
+            <h5 class="text-primary">Upload image to use image AI to make diagnosis </h5>
+            <input type="file" id="imageToBeDiagnosed" accept="image/*" />
+            <button class="btn-success" onclick="GetGroqMetaLlamaAIResponse()">Upload</button>
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                  <div id="AIResponse" class="border rounded p-4 bg-light shadow-sm" style="min-height: 120px;">
+                    <!-- AI Response will appear here -->
+                  </div>
+                </div>
+              </div>
+           </div>
+      </div>
+    </div>
+  
+    <!-- Vital Signs -->
+    <div class="card mb-3">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Vital Signs</h5>
+        <button class="btn btn-link" data-bs-toggle="collapse" data-bs-target="#vitalsContent">Expand</button>
+      </div>
+      <div id="vitalsContent" class="collapse">
+        <div class="card-body">
+            <button class="btn-success" onclick="ShowVitalSignsModal('{{ medicalHistoryDetail.medical_history_id}}')">Add Vital Sign</button>
+          {% if medicalHistoryDetail.vital_signs.all %}
+          <ul class="list-group mb-3">
+            {% for vital in medicalHistoryDetail.vital_signs.all %}
+            <li class="list-group-item">
+              <strong>BP:</strong> {{ vital.blood_pressure_systolic }}/{{ vital.blood_pressure_diastolic }} mmHg<br>
+              <strong>Heart Rate:</strong> {{ vital.heart_rate }} bpm<br>
+              <strong>Resp Rate:</strong> {{ vital.respiratory_rate }} bpm<br>
+              <strong>Temp:</strong> {{ vital.temperature }}°C<br>
+              <strong>Weight:</strong> {{ vital.weight }} kg | <strong>Height:</strong> {{ vital.height }} cm<br>
+              <strong>O₂ Saturation:</strong> {{ vital.oxygen_saturation }}%
+            </li>
+            {% endfor %}
+          </ul>
+          {% else %}
+          <p>No Vital Signs recorded.</p>
+          {% endif %}
+        </div>
+
+
+
+        
+
+{% endblock %}
+
+{% block extra_scripts %}
+
+<script>
+
+
+
+   function ShowHPIModal(medHistId)
+   {
+     new bootstrap.Modal(document.getElementById('hpiModal')).show();
+     document.getElementById("medicalHistoryIdHPI").value = medHistId;
+   }
+   function ShowPatientIntakeModal(medHistId)
+   {
+    new bootstrap.Modal(document.getElementById('patientIntakeModal')).show();
+     document.getElementById("medicalHistoryIdPatientIntake").value = medHistId;
+   }
+   function ShowDiagnosesModal(medHistId)
+   {
+     new bootstrap.Modal(document.getElementById('diagnosesModal')).show();
+     document.getElementById("medicalHistoryIdDiagnoses").value = medHistId;
+   }
+   function ShowVitalSignsModal(medHistId)
+   {
+     new bootstrap.Modal(document.getElementById('vitalSignsModal')).show();
+     document.getElementById("medicalHistoryIdVitalSigns").value = medHistId;
+   }
+
+
+
+   document.getElementById('hpiForm').addEventListener('submit', function (e) {
+       e.preventDefault();
+       const form = e.target;
+       const formData = new FormData(form);
+
+       const token = document.querySelector('meta[name="csrf-token"]').content;
+
+       $.ajax({
+          url: "/EMRApp/createHPI",
+          type: "POST",
+          headers: {
+            'X-CSRFToken': token
+          },
+          data: formData,
+          processData: false,
+          contentType: false,
+          success: function (data) {
+               alert("HPI created successfully!");
+               form.reset();
+               bootstrap.Modal.getInstance(document.getElementById('hpiModal')).hide();
+              
+            },
+            error: function (xhr) {
+              alert("Error: " + xhr.responseText);
+            }
+        });
+   });
+
+
+
+   document.getElementById('patientIntakeForm').addEventListener('submit', function (e) {
+       e.preventDefault();
+       const form = e.target;
+       const formData = new FormData(form);
+
+       const token = document.querySelector('meta[name="csrf-token"]').content;
+
+       $.ajax({
+          url: "/EMRApp/createPatientIntake",
+          type: "POST",
+          headers: {
+            'X-CSRFToken': token
+          },
+          data: formData,
+          processData: false,
+          contentType: false,
+          success: function (data) {
+               alert("Patient intake created successfully!");
+               form.reset();
+               bootstrap.Modal.getInstance(document.getElementById('patientIntakeModal')).hide();
+              
+            },
+            error: function (xhr) {
+              alert("Error: " + xhr.responseText);
+            }
+        });
+   });
+
+
+   document.getElementById('diagnosesForm').addEventListener('submit', function (e) {
+       e.preventDefault();
+       const form = e.target;
+       const formData = new FormData(form);
+
+       const token = document.querySelector('meta[name="csrf-token"]').content;
+
+       $.ajax({
+          url: "/EMRApp/createDiagnoses",
+          type: "POST",
+          headers: {
+            'X-CSRFToken': token
+          },
+          data: formData,
+          processData: false,
+          contentType: false,
+          success: function (data) {
+               alert("Diagnoses created successfully!");
+               form.reset();
+               bootstrap.Modal.getInstance(document.getElementById('diagnosesModal')).hide();
+              
+            },
+            error: function (xhr) {
+              alert("Error: " + xhr.responseText);
+            }
+        });
+   });
+
+
+
+   document.getElementById('vitalSignForm').addEventListener('submit', function (e) {
+       e.preventDefault();
+       const form = e.target;
+       const formData = new FormData(form);
+
+       const token = document.querySelector('meta[name="csrf-token"]').content;
+
+       $.ajax({
+          url: "/EMRApp/createVitalSign",
+          type: "POST",
+          headers: {
+            'X-CSRFToken': token
+          },
+          data: formData,
+          processData: false,
+          contentType: false,
+          success: function (data) {
+               alert("Vital Sign created successfully!");
+               form.reset();
+               bootstrap.Modal.getInstance(document.getElementById('vitalSignModal')).hide();
+              
+            },
+            error: function (xhr) {
+              alert("Error: " + xhr.responseText);
+            }
+        });
+   });
+
+
+
+        function GetGroqMetaLlamaAIResponse() {
+           var userText = "What's the most possible diagnosis from the image?";
+           var imageFile = $("#imageToBeDiagnosed")[0].files[0];
+
+           userText = "What's AI"
+
+
+           if (!userText || !imageFile) {
+            alert("Please enter a question and select an image.");
+            return;  
+           }
+
+
+           const token = document.querySelector('meta[name="csrf-token"]').content;
+
+          var formData = new FormData();
+          formData.append("userText", userText);
+          formData.append("image", imageFile);
+
+          $.ajax({
+            url: "/EMRApp/getGroqMetaLlamaAIResponse",
+            type: "POST",
+            headers: {
+               'X-CSRFToken': token
+              },
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (data) {
+               $("#AIResponse").html(data.response);
+               $("#question").val("");
+               $("#image").val(""); // reset file input
+            },
+            error: function (xhr) {
+              alert("Error: " + xhr.responseText);
+           }
+         });
+       }
+
+</script>
+
+{% endblock %}

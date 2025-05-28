@@ -1,0 +1,345 @@
+
+{% extends "layout.html" %}
+
+{% load static %}
+
+
+{% block title %}Patients and Medical Histories{% endblock %}
+
+{% block extra_head %}
+
+   <style>
+    .nested-table {
+      background-color: #f9f9f9;
+      margin-top: 10px;
+    }
+    .nested-table th, .nested-table td {
+      font-size: 0.9rem;
+    }
+    .expand-btn {
+      cursor: pointer;
+      color: #0d6efd;
+    }
+    .table-container {
+      overflow-x: auto;
+    }
+  </style>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container">
+  <h2 class="mb-4">Patient Records</h2>
+  <button class="btn btn-primary mb-3" onclick="showPatientModal()">Add Patient</button>
+
+  <div class="table-container">
+   
+    <table class="table table-bordered table-hover align-middle">
+        <thead class="table-dark">
+          <tr>
+            <th>#</th>
+            <th>Card Number</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Gender</th>
+            <th>Nationality</th>
+            <th>Date of Birth</th>
+            <th>Phone</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="patientTableBody">
+          {% for patient in patients %}
+            <tr>
+              <td>{{ patient.patient_id }}</td>
+              <td>{{ patient.card_number }}</td>
+              <td>{{ patient.first_name }}</td>
+              <td>{{ patient.last_name }}</td>
+              <td>{{ patient.gender }}</td>
+              <td>{{ patient.nationality }}</td>
+              <td>{{ patient.date_of_birth }}</td>
+              <td>{{ patient.phone_number }}</td>
+              <td>{{ patient.patient_status }}</td>
+              <td>
+                <button class="btn btn-sm btn-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#history-{{ patient.patient_id }}">
+                  Expand
+                </button>
+                <button onclick="UpdatePatient('{{ patient.patient_id }}')">Edit</button>
+                <button onclick="DeletePatient('{{ patient.patient_id }}')">Delete</button>
+                
+              </td>
+            </tr>
+             
+            <tr class="collapse" id="history-{{ patient.patient_id }}">
+              <td colspan="10">
+                <button class="btn btn-primary mb-3" onclick="CreateMedicalRecord('{{ patient.patient_id }}')">Add Medical Record</button>
+                 <br>
+                 <strong>Medical Records:</strong>
+                {% if patient.medical_histories.all %}
+                  <ul>
+                    {% for history in patient.medical_histories.all %}
+                      <li class="card cursor-pointer mb-2" onclick="GoToMedicalHistoryDetails('{{ history.medical_history_id }}')">
+                        - {{ history.date|date:"Y-m-d H:i" }}
+                          ({{ history.status }})
+                      </li>
+                    {% endfor %}
+                  </ul>
+                {% else %}
+                  <p class="text-muted">No medical histories available.</p>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="10">No patients found.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      
+
+  </div>
+</div>
+
+<!-- Patient Modal -->
+<div class="modal fade" id="patientModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+        <form id="patientForm">
+            <div class="modal-header">
+              <h5 class="modal-title">Add Patient</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              
+              <input class="form-control mb-2" type="hidden" name="card_number" />
+          
+              <input class="form-control mb-2" placeholder="First Name" name="first_name" required />
+              <input class="form-control mb-2" placeholder="Middle Name" name="last_name" required />
+              <input class="form-control mb-2" placeholder="Grandfather Name" name="grandfather_name" />
+          
+              <select class="form-control mb-2" name="gender" required>
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+              </select>
+          
+              <input class="form-control mb-2" type="date" name="date_of_birth" required />
+              <input class="form-control mb-2" placeholder="Phone Number" name="phone_number" />
+              <input class="form-control mb-2" placeholder="Nationality" name="nationality" />
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary">Save Patient</button>
+            </div>
+          </form>
+          
+    </div>
+  </div>
+</div>
+
+<!-- Medical History Modal -->
+<div class="modal fade" id="historyModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="historyForm">
+        <div class="modal-header">
+          <h5 class="modal-title">Add Medical History</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="historyPatientId" />
+          <input class="form-control mb-2" placeholder="Description" name="description" required />
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Save History</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  let patients = [];
+  let historyId = 1;
+
+  function showPatientModal() {
+    new bootstrap.Modal(document.getElementById('patientModal')).show();
+  }
+
+  function showHistoryModal(patientId) {
+    document.getElementById('historyPatientId').value = patientId;
+    new bootstrap.Modal(document.getElementById('historyModal')).show();
+  }
+
+
+
+  document.getElementById('patientForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+  const form = e.target;
+  const formData = new FormData(form);
+
+  const token = document.querySelector('meta[name="csrf-token"]').content;
+
+  $.ajax({
+    url: "/patients/create/",
+    type: "POST",
+    headers: {
+      'X-CSRFToken': token
+    },
+    data: formData,
+    processData: false,
+    contentType: false,
+    success: function (data) {
+      alert("Patient created successfully!");
+      form.reset();
+      bootstrap.Modal.getInstance(document.getElementById('patientModal')).hide();
+      renderPatients();  // Update your UI
+    },
+    error: function (xhr) {
+      alert("Error: " + xhr.responseText);
+    }
+  });
+});
+
+
+
+
+function UpdatePatient(patientId, formData) {
+  const token = document.querySelector('meta[name="csrf-token"]').content;
+
+  $.ajax({
+    url: `/patients/update/${patientId}/`,
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': token
+    },
+    data: formData,
+    processData: false,
+    contentType: false,
+    success: function () {
+      alert('Patient updated!');
+      renderPatients();
+    },
+    error: function () {
+      alert('Error updating patient.');
+    }
+  });
+}
+
+
+
+function DeletePatient(patientId) {
+  const token = document.querySelector('meta[name="csrf-token"]').content;
+
+  $.ajax({
+    url: `/patients/delete/${patientId}/`,
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': token
+    },
+    success: function () {
+      alert('Patient deleted!');
+      renderPatients(); // refresh list
+    },
+    error: function () {
+      alert('Error deleting patient.');
+    }
+  });
+}
+
+   
+  
+
+    function CreateMedicalRecord(patientId) {
+
+      const token = document.querySelector('meta[name="csrf-token"]').content;
+
+      $.ajax({
+        url: "/medical-history/create/",
+        type: "POST",
+        headers: {
+         'X-CSRFToken': token
+        },
+        data: {patientId:patientId},
+        success: function (data) {
+          alert("Medical Record created successfully!");
+          form.reset();
+          bootstrap.Modal.getInstance(document.getElementById('historyModal')).hide();
+          renderPatients();
+        },
+        error: function (xhr) {
+          alert("Error: " + xhr.responseText);
+        }
+      });
+   }
+
+  function toggleHistories(id) {
+    document.getElementById(`history-row-${id}`).classList.toggle('d-none');
+  }
+
+  function renderPatients() {
+    const tbody = document.getElementById('patientTableBody');
+    tbody.innerHTML = '';
+
+    patients.forEach((p, index) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${index + 1}</td>
+        <td>${p.cardNumber}</td>
+        <td>${p.firstName} ${p.lastName} ${p.grandFatherName || ''}</td>
+        <td>${p.gender}</td>
+        <td>${p.nationality}</td>
+        <td>${p.dateOfBirth}</td>
+        <td>${p.phone}</td>
+        <td>Active</td>
+        <td>
+          <span class="expand-btn" onclick="toggleHistories(${p.id})">View Histories</span> |
+          <button class="btn btn-sm btn-success" onclick="showHistoryModal(${p.id})">+ History</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+
+      const historyRow = document.createElement('tr');
+      historyRow.id = `history-row-${p.id}`;
+      historyRow.classList.add('d-none');
+      historyRow.innerHTML = `
+        <td colspan="9">
+          <table class="table nested-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Description</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${p.histories.map(h => `
+                <tr>
+                  <td>${h.id}</td>
+                  <td>${h.description}</td>
+                  <td>
+                    <a href="medical-history.html?id=${h.id}" class="btn btn-sm btn-outline-secondary">Details</a>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </td>
+      `;
+      tbody.appendChild(historyRow);
+    });
+  }
+
+
+   function GoToMedicalHistoryDetails(medHistId){       
+     window.location.href = '/medical-history/detail?medicalHistoryId=' + medHistId;
+   }
+
+</script>
+
+
+{% endblock %}
